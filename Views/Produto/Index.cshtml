@@ -1,0 +1,189 @@
+@{
+    ViewData["Title"] = "Index";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.1/css/responsive.dataTables.min.css">
+
+<style>
+    .cor1 {}
+
+    .cor2 {}
+</style>
+
+
+
+
+<div>
+    <h2>Listagem Produtos</h2>
+</div>
+<div>
+    <div>
+        <button type="button" id="btnNewProduto" name="btnNewProduto" class="btn btn-primary mb-5"
+            style="width:200px;margin-top:5px;">Novo Produto</button>
+    </div>
+
+    <table id="tabelaProduto" class="cell-border compact stripe " style="width:100%; margin-top:5px; cursor:default;">
+        <thead>
+            <tr>
+                <th>IdProduto</th>
+                <th>Nome</th>
+                <th>Estoque</th>
+                <th>Preço</th>
+                <th>IdCategoria</th>
+                <th>Categoria</th>
+                <th>Editar</th>
+                <th>Excluir</th>
+
+            </tr>
+        </thead>
+    </table>
+</div>
+
+
+
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            BuscarProduto();
+
+
+        });
+
+        function BuscarProduto() {
+            $.ajax({
+                url: '@Url.Action("ListProduto", "Produto")',
+                type: "GET",
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                beforeSend: function (xhr) {
+                },
+                success: function (data) {
+                    console.log(data);
+                    CarregarTabela(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(xhr + ' - ' + ajaxOptions + ' - ' + thrownError);
+                },
+            });
+        }
+
+        function CarregarTabela(produto) {
+            $('#tabelaProduto')
+                .DataTable({
+                    responsive: {
+                        details: true
+                    },
+                    columnDefs: [
+                        { responsivePriority: 0, targets: 0 },
+                        { responsivePriority: 1, targets: 1 },
+                        { responsivePriority: 2, targets: 2 },
+                        { responsivePriority: 3, targets: 3 },
+                        { responsivePriority: 4, targets: 4 },
+                        { responsivePriority: 5, targets: 5 },
+                        { responsivePriority: 6, targets: 6 },
+                        { responsivePriority: 7, targets: 7 }
+
+                    ],
+                    "data": produto,
+                    "pageLength": 50,
+                    "order": [[0, "desc"]],
+                    "language": {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "Não há registros para o texto pesquisado",
+                        "sEmptyTable": "Nenhum dado disponível na tabela",
+                        "sInfo": "Mostrando _START_ a _END_ de um total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de um total de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sSearch": "Buscar:",
+                        "sUrl": "",
+                        "sInfoThousands": ",",
+                        "sLoadingRecords": "Carregando...",
+                        "oPaginate": {
+                            "sFirst": "Primeiro",
+                            "sLast": "Último",
+                            "sNext": "Seguinte",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Ativar para ordenar a coluna de maneira ascendente",
+                            "sSortDescending": ": Ativar para ordenar a coluna de maneira descendente"
+                        }
+                    },
+                    "columns": [
+                        {
+                            data: "idProduto",
+                            className: 'font-th-detail-table text-center'
+                        },
+                        {
+                            data: "nome",
+                            className: 'font-th-detail-table'
+                        },
+                        {
+                            data: "estoque",
+                            className: 'font-th-detail-table'
+                        },
+                        {
+                            data: "preco",
+                            className: 'font-th-detail-table'
+                        },
+                        {
+                            data: "idCategoria",
+                            className: 'font-th-detail-table ',
+                        },
+                        {
+                            data: "categoria",
+                            className: 'font-th-detail-table ',
+                        },
+                        {
+                            "data": null,
+                            "render": function (coluna, type, row, meta) {
+                                if (type === 'display') {
+                                    coluna = '<a href="@Url.Action("Editar", "Produto")?id=' + row.IdProduto + '"><i class="bi bi-ticket-detailed text-center ms-4 a-link-Detalhes "></i></a>';
+                                }
+                                return coluna;
+                            },
+                            className: 'font-th-detail-table details-cell '
+                        },
+                        {
+                            "data": null,
+                            "render": function (coluna, type, row, meta) {
+                                if (type === 'display') {
+                                    //coluna = '<a href=Cliente/Delete?id=' + row.clienteId + '><i class="bi bi-trash3 ms-4 text-danger"></i></a>';
+                                    coluna = '<a href="@Url.Action("Delete", "Produto")?id=' + row.IdProduto + '"><i class="bi bi-trash3 ms-4 text-danger"</i></a>';
+                                }
+                                return coluna;
+                            },
+                            className: 'font-th-detail-table'
+                        },
+                    ],
+                    "bDestroy": true,
+                    "createdRow": function (row, data, dataIndex) {
+                        // Adicione cores diferentes para linhas alternadas
+                        if (dataIndex % 2 === 0) {
+                            $(row).addClass('cor1'); // Adicione uma classe para a cor 1
+                        } else {
+                            $(row).addClass('cor2'); // Adicione uma classe para a cor 2
+                        }
+                    },
+                });
+        }
+
+    </script>
+}
